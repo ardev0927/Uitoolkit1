@@ -1,6 +1,6 @@
 # uitoolkit1
 
-Cutomize bottom navigation and fab
+Customize bottom navigation and fab
 
 ## Getting Started
 
