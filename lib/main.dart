@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:uitoolkit1/configs/routes.dart';
+import 'package:uitoolkit1/screens/account_screen.dart';
+import 'package:uitoolkit1/screens/home_screen.dart';
+import 'package:uitoolkit1/screens/messages_screen.dart';
+import 'package:uitoolkit1/screens/wishlist_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,6 +54,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  int _tabIndex = 0;
+  String _selected = Routes.home;
 
   void _incrementCounter() {
     setState(() {
@@ -63,53 +70,110 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      body: IndexedStack(
+        index: _exportIndexed(_selected),
+        children: const [
+          HomeScreen(),
+          WishlistScreen(),
+          MessagesScreen(),
+          AccountScreen(),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+      bottomNavigationBar: _buildBottomMenu(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  /// build bottom menu
+  Widget _buildBottomMenu() {
+    return BottomAppBar(
+      child: SizedBox(
+        height: 56,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildItemMenu(Routes.home),
+            _buildItemMenu(Routes.wishlist),
+            const SizedBox(width: 56),
+            _buildItemMenu(Routes.message),
+            _buildItemMenu(Routes.account),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build item menu
+  Widget _buildItemMenu(String route) {
+    Color? color;
+    String title = 'home';
+    IconData iconData = Icons.help_outline;
+    switch (route) {
+      case Routes.home:
+        iconData = Icons.home;
+        title = 'Home';
+        break;
+      case Routes.wishlist:
+        iconData = Icons.bookmark_outline;
+        title = 'Wishlist';
+        break;
+      case Routes.message:
+        iconData = Icons.chat_outlined;
+        title = 'Messages';
+        break;
+      case Routes.account:
+        iconData = Icons.account_circle_outlined;
+        title = 'Account';
+        break;
+      default:
+        iconData = Icons.home;
+        title = 'Home';
+    }
+    if (_selected == route) {
+      color = Theme.of(context).primaryColor;
+    }
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          _selected = route;
+        });
+      },
+      padding: EdgeInsets.zero,
+      icon: Column(
+        children: [
+          Icon(iconData, color: color),
+          const SizedBox(height: 2),
+          Text(title,
+              style: TextStyle(color: color, fontSize: 10),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
+  }
+
+  ///Export index stack
+  int _exportIndexed(String route) {
+    switch (route) {
+      case Routes.home:
+        return 0;
+      case Routes.wishlist:
+        return 1;
+      case Routes.message:
+        return 2;
+      case Routes.account:
+        return 3;
+      default:
+        return 0;
+    }
   }
 }
